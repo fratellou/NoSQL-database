@@ -1,0 +1,10 @@
+arr: new 1 
+stack: new 1 1 2 1 1 
+set: new val 
+arr: struct 10 
+tree: struct 1 3 
+set: struct 1 
+hash: struct 1,val 
+queue: struct20 val4 val5 val4 val4 
+tree: struct20 -3 
+

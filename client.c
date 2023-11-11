@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
         perror("Error receiving response from server");
         exit(EXIT_FAILURE);
       }
-      printf("REQUEST STATUS: %s\n", response);
+      printf("REQUEST: %s\n", response);
 
       close(client_socket);
     }

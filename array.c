@@ -7,7 +7,7 @@
 #include "macro.h"
 
 // This function implements the array operation
-void array(char *db_file, char **query) {
+void array(char *db_file, char **query, char *req) {
   char **line = malloc(MAX_LEN * sizeof(char *));
   int size = 0;
   int isnt_empty = 0;
@@ -19,7 +19,7 @@ void array(char *db_file, char **query) {
       ARADD(array, atoi(line[i]));
     }
   }
-  array_commands(query, array);
+  array_commands(query, array, req);
   write_array(db_file, array, query[1], "arr:");
   for (int i = 0; i < size; i++) {
     free(line[i]);
@@ -30,21 +30,21 @@ void array(char *db_file, char **query) {
 }
 
 // Function to perform array commands based on the query
-void array_commands(char **query, Array *array) {
+void array_commands(char **query, Array *array, char *req) {
   if (!strcmp(query[0], "ARADD")) {
-    printf("-> %d\n", ARADD(array, atoi(query[2])));
+    sprintf(req, "%d", ARADD(array, atoi(query[2])));
   } else if (!strcmp(query[0], "ARINS")) {
-    printf("-> %d\n", ARINS(array, atoi(query[2]), atoi(query[3])));
+    sprintf(req, "%d", ARINS(array, atoi(query[2]), atoi(query[3])));
   } else if (!strcmp(query[0], "ARDEL")) {
-    printf("-> %d\n", ARDEL(array));
+    sprintf(req, "%d", ARDEL(array));
   } else if (!strcmp(query[0], "ARREM")) {
-    printf("-> %d\n", ARREM(array, atoi(query[2])));
+    sprintf(req, "%d", ARREM(array, atoi(query[2])));
   } else if (!strcmp(query[0], "ARGET")) {
-    printf("-> %d\n", ARGET(array, atoi(query[2])));
+    sprintf(req, "%d", ARGET(array, atoi(query[2])));
   } else if (!strcmp(query[0], "ARSRCH")) {
-    printf("-> %d\n", ARSRCH(array, atoi(query[2])));
+    sprintf(req, "%d", ARSRCH(array, atoi(query[2])));
   } else if (!strcmp(query[0], "ARCHG")) {
-    printf("-> %d\n", ARCHG(array, atoi(query[2]), atoi(query[3])));
+    sprintf(req, "%d", ARCHG(array, atoi(query[2]), atoi(query[3])));
   } else {
     ERROR;
   }

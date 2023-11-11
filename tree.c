@@ -7,7 +7,7 @@
 #include "macro.h"
 
 // This function is responsible for managing the operations on the tree
-void tree(char *db_file, char **query) {
+void tree(char *db_file, char **query, char *req) {
   char **line = malloc(MAX_LEN * sizeof(char *));
   int size = 0;
   int isnt_empty = 0;
@@ -20,7 +20,7 @@ void tree(char *db_file, char **query) {
       root = TADD(root, atoi(line[i]));
     }
   }
-  tree_commands(query, &root);
+  tree_commands(query, &root, req);
   printTree(root, 0);
   // Writing the tree back to the database file
   write_tree(db_file, &root, query[1], "tree:");
@@ -32,15 +32,15 @@ void tree(char *db_file, char **query) {
 }
 
 // This function handles the various commands that can be executed on the tree
-void tree_commands(char **query, Node_tree **root) {
+void tree_commands(char **query, Node_tree **root, char *req) {
   if (!strcmp(query[0], "TADD")) {
     *root = TADD(*root, atoi(query[2]));
   } else if (!strcmp(query[0], "TSRCH")) {
     Node_tree *search = TSRCH(*root, atoi(query[2]));
     if (search != NULL) {
-      printf("\n-> TRUE\n");
+      strcpy(req, "TRUE");
     } else
-      printf("\n-> FALSE\n");
+      strcpy(req, "FALSE");
   } else if (!strcmp(query[0], "TDEL")) {
     *root = TDEL(*root, atoi(query[2]));
   } else {

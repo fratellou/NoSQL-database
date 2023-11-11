@@ -1,4 +1,4 @@
-#include "double_set.h"
+#include "double_list.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -7,7 +7,7 @@
 #include "macro.h"
 
 // This function implements the double linked set operation
-void Dset(char *db_file, char **query) {
+void Dlist(char *db_file, char **query, char *req) {
   char **line = malloc(MAX_LEN * sizeof(char *));
   int size = 0;
   int isnt_empty = 0;
@@ -18,7 +18,7 @@ void Dset(char *db_file, char **query) {
       DSADD(set, line[i]);
     }
   }
-  Dset_commands(query, set);
+  Dset_commands(query, set, req);
   write_Dset(db_file, set, query[1], "dset:");
   free_Dset(set);
   for (int i = 0; i < size; i++) {
@@ -29,16 +29,16 @@ void Dset(char *db_file, char **query) {
 
 // This function takes a query and a double linked set object as parameters and
 // executes the command specified in the query
-void Dset_commands(char **query, DSet *set) {
+void Dset_commands(char **query, DSet *set, char *req) {
   if (!strcmp(query[0], "DSADD")) {
-    printf("-> %s\n", DSADD(set, query[2]));
+    strcpy(req, DSADD(set, query[2]));
   } else if (!strcmp(query[0], "DSREM")) {
-    printf("-> %s\n", DSREM(set, query[2]));
+    strcpy(req, DSREM(set, query[2]));
   } else if (!strcmp(query[0], "DSISMEMBER")) {
     if (!DSISMEMBER(set, query[2]))
-      printf("\n-> FALSE\n");
+      strcpy(req, "FALSE");
     else
-      printf("\n-> TRUE\n");
+      strcpy(req, "TRUE");
   } else {
     ERROR;
   }

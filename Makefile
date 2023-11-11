@@ -2,8 +2,8 @@ CFLAGS=-Wall -Wextra -Werror
 
 all:server client
 
-server: database.o hash.o stack.o array.o set.o tree.o queue.o hash.o double_set.o 
-	gcc $(CFLAGS) database.o hash.o array.o tree.o stack.o set.o queue.o double_set.o -o server
+server: database.o hash.o stack.o array.o list.o tree.o queue.o hash.o double_list.o 
+	gcc $(CFLAGS) database.o hash.o array.o tree.o stack.o list.o queue.o double_list.o -o server
 
 client: client.o
 	gcc $(CFLAGS) client.o -o dbms
@@ -11,7 +11,7 @@ client: client.o
 client.o: client.c macro.h
 	gcc $(CFLAGS) -c client.c
 
-database.o: macro.h hash.h hash.c queue.c queue.h set.c set.h stack.h stack.c database.c
+database.o: macro.h hash.h hash.c queue.c queue.h list.c list.h stack.h stack.c database.c
 	gcc $(CFLAGS) -c database.c
 
 hash.o: macro.h hash.h hash.c
@@ -20,11 +20,11 @@ hash.o: macro.h hash.h hash.c
 stack.o: macro.h stack.h stack.c
 	gcc $(CFLAGS) -c stack.c
 
-set.o: macro.h set.h set.c
-	gcc $(CFLAGS) -c set.c
+list.o: macro.h list.h list.c
+	gcc $(CFLAGS) -c list.c
 
-double_set.o: macro.h double_set.h double_set.c
-	gcc $(CFLAGS) -c double_set.c
+double_list.o: macro.h double_list.h double_list.c
+	gcc $(CFLAGS) -c double_list.c
 
 queue.o: macro.h queue.h queue.c 
 	gcc $(CFLAGS) -c queue.c

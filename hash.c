@@ -7,7 +7,7 @@
 #include "macro.h"
 
 // This function implements the hash operation
-void hash(char *db_file, char **query) {
+void hash(char *db_file, char **query, char *req) {
   char **line = malloc(MAX_LEN * sizeof(char *));
   int isnt_empty = 0;
   int size = 0;
@@ -22,20 +22,20 @@ void hash(char *db_file, char **query) {
       HSET(hashtable, first_key, second_val);
     }
   }
-  hash_commands(query, hashtable);
+  hash_commands(query, hashtable, req);
   write_hash(db_file, hashtable, query[1], "hash:");
   free(line);
   destroyHashTable(hashtable);
 }
 
 // Function to perform hash commands
-void hash_commands(char **query, HashTable *hash) {
+void hash_commands(char **query, HashTable *hash, char *req) {
   if (!strcmp(query[0], "HSET")) {
-    printf("-> %s\n", HSET(hash, query[2], query[3]));
+    strcpy(req, HSET(hash, query[2], query[3]));
   } else if (!strcmp(query[0], "HDEL")) {
-    printf("-> %s\n", HDEL(hash, query[2]));
+    strcpy(req, HDEL(hash, query[2]));
   } else if (!strcmp(query[0], "HGET")) {
-    printf("-> %s\n", HGET(hash, query[2]));
+    strcpy(req, HGET(hash, query[2]));
   } else {
     ERROR;
   }

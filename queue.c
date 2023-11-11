@@ -7,7 +7,7 @@
 #include "macro.h"
 
 // This function implements the queue operation
-void queue(char *db_file, char **query) {
+void queue(char *db_file, char **query, char *req) {
   char **line = malloc(MAX_LEN * sizeof(char *));
   int isnt_empty = 0;
   int size = 0;
@@ -18,7 +18,7 @@ void queue(char *db_file, char **query) {
       QPUSH(&queue, line[i]);
     }
   }
-  queue_commands(query, &queue);
+  queue_commands(query, &queue, req);
   write_queue(db_file, &queue, query[1], "queue:");
   for (int i = 0; i < queue.size; i++) {
     free(line[i]);
@@ -27,12 +27,12 @@ void queue(char *db_file, char **query) {
 }
 
 // Process the queue commands specified in the query
-void queue_commands(char **query, Queue *queue) {
+void queue_commands(char **query, Queue *queue, char *req) {
   if (!strcmp(query[0], "QPUSH")) {
     QPUSH(queue, query[2]);
-    printf("-> %s\n", query[2]);
+    strcpy(req, query[2]);
   } else if (!strcmp(query[0], "QPOP")) {
-    printf("-> %s\n", QPOP(queue));
+    strcpy(req, QPOP(queue));
   } else
     ERROR;
 }

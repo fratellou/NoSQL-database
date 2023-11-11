@@ -6,8 +6,8 @@ typedef struct {
   int size;
 } Array;
 
-void array(char *db_file, char **query);
-void array_commands(char **query, Array *array);
+void array(char *db_file, char **query, char *req);
+void array_commands(char **query, Array *array, char *req);
 Array *createArray(int size);
 int ARADD(Array *arr, int element);
 int ARINS(Array *arr, int index, int element);

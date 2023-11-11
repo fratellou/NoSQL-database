@@ -9,18 +9,18 @@
 #include <unistd.h>
 
 #include "array.h"
-#include "double_set.h"
+#include "double_list.h"
 #include "hash.h"
+#include "list.h"
 #include "macro.h"
 #include "queue.h"
-#include "set.h"
 #include "stack.h"
 #include "tree.h"
 
 #define PORT 6379
 pthread_mutex_t mutex;
 
-void request(char *db_file, char **query);
+void request(char *db_file, char **query, char *req);
 void handle_client(int client_socket);
 
 int main() {
@@ -86,7 +86,7 @@ void handle_client(int client_socket) {
     perror("Error reading from socket");
     exit(EXIT_FAILURE);
   }
-
+  char *req = malloc(MAX_LEN * sizeof(char));
   char **parsed_query = malloc(MAX_LEN * sizeof(char *));
   char *istr = strtok(query, " ");
   int i = 0;
@@ -97,39 +97,40 @@ void handle_client(int client_socket) {
     i++;
   }
 
-  request(db_file, parsed_query);
-  send(client_socket, "DONE", 4, 0);
+  request(db_file, parsed_query, req);
+  send(client_socket, req, 4, 0);
   free(db_file);
   free(query);
+  free(req);
   pthread_mutex_destroy(&mutex);
   close(client_socket);
 
   printf("Connection completed\n");
 }
 
-void request(char *db_file, char **query) {
+void request(char *db_file, char **query, char *req) {
   pthread_mutex_lock(&mutex);
   if (!strcmp(query[0], "SADD") || !strcmp(query[0], "SREM") ||
       !strcmp(query[0], "SISMEMBER")) {
-    set(db_file, query);
+    list(db_file, query, req);
   } else if (!strcmp(query[0], "SPUSH") || !strcmp(query[0], "SPOP")) {
-    stack(db_file, query);
+    stack(db_file, query, req);
   } else if (!strcmp(query[0], "QPUSH") || !strcmp(query[0], "QPOP")) {
-    queue(db_file, query);
+    queue(db_file, query, req);
   } else if (!strcmp(query[0], "HSET") || !strcmp(query[0], "HDEL") ||
              !strcmp(query[0], "HGET")) {
-    hash(db_file, query);
+    hash(db_file, query, req);
   } else if (!strcmp(query[0], "DSADD") || !strcmp(query[0], "DSREM") ||
              !strcmp(query[0], "DSISMEMBER")) {
-    Dset(db_file, query);
+    Dlist(db_file, query, req);
   } else if (!strcmp(query[0], "ARADD") || !strcmp(query[0], "ARREM") ||
              !strcmp(query[0], "ARDEL") || !strcmp(query[0], "ARINS") ||
              !strcmp(query[0], "ARGET") || !strcmp(query[0], "ARSRCH") ||
              !strcmp(query[0], "ARCHG")) {
-    array(db_file, query);
+    array(db_file, query, req);
   } else if (!strcmp(query[0], "TADD") || !strcmp(query[0], "TSRCH") ||
              !strcmp(query[0], "TDEL")) {
-    tree(db_file, query);
+    tree(db_file, query, req);
   } else
     ERROR;
   pthread_mutex_unlock(&mutex);

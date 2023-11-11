@@ -7,7 +7,7 @@
 #include "macro.h"
 
 // This function implements the stack operation
-void stack(char *db_file, char **query) {
+void stack(char *db_file, char **query, char *request) {
   char **line = malloc(MAX_LEN * sizeof(char *));
   int isnt_empty = 0;
   int size = 0;
@@ -18,7 +18,7 @@ void stack(char *db_file, char **query) {
       SPUSH(&stack, line[i]);
     }
   }
-  stack_commands(query, &stack);
+  stack_commands(query, &stack, request);
   // Write the stack elements back to the database file
   write_stack(db_file, &stack, query[1], "stack:");
   for (int i = 0; i < stack.size; i++) {
@@ -28,12 +28,12 @@ void stack(char *db_file, char **query) {
 }
 
 // This function performs stack commands based on the query
-void stack_commands(char **query, Stack *stack) {
+void stack_commands(char **query, Stack *stack, char *request) {
   if (!strcmp(query[0], "SPUSH")) {
     SPUSH(stack, query[2]);
-    printf("-> %s\n", query[2]);
+    strcpy(request, query[2]);
   } else if (!strcmp(query[0], "SPOP")) {
-    printf("-> %s\n", SPOP(stack));
+    strcpy(request, SPOP(stack));
   } else
     ERROR;
 }
@@ -80,9 +80,7 @@ void write_stack(char *filename, Stack *stack, char *struct_name,
         fprintf(temp, "%s %s ", struct_type, struct_name);
         for (int i = 0; i < stack->size; i++) {
           fprintf(temp, "%s ", stack->head->data);
-          Node *temp_node = stack->head;
           stack->head = stack->head->next;
-          free(temp_node->data);
         }
         fprintf(temp, "\n");
         new_input = 1;

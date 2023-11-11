@@ -12,8 +12,8 @@ typedef struct DSet {
   int size;
 } DSet;
 
-void Dset(char *db_file, char **query);
-void Dset_commands(char **query, DSet *set);
+void Dlist(char *db_file, char **query, char *req);
+void Dset_commands(char **query, DSet *set, char *req);
 DSet *createDSet(int size);
 int Dset_calc(char *key);
 char *DSADD(DSet *set, char *element);

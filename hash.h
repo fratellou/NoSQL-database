@@ -13,8 +13,8 @@ typedef struct HashTable {
   int capacity;
 } HashTable;
 
-void hash(char *db_file, char **query);
-void hash_commands(char **query, HashTable *hash);
+void hash(char *db_file, char **query, char *req);
+void hash_commands(char **query, HashTable *hash, char *req);
 HashTable *createHashTable(int size);
 int hash_calc(char *key);
 char *HSET(HashTable *hashtable, char *key, char *value);

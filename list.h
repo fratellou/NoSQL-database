@@ -11,8 +11,8 @@ typedef struct Set {
   int size;
 } Set;
 
-void set(char *db_file, char **query);
-void set_commands(char **query, Set *set);
+void list(char *db_file, char **query, char *req);
+void set_commands(char **query, Set *set, char *req);
 Set *createSet(int size);
 int set_calc(char *key);
 char *SADD(Set *set, char *element);

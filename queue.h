@@ -12,8 +12,8 @@ typedef struct Queue {
   int size;
 } Queue;
 
-void queue(char *db_file, char **query);
-void queue_commands(char **query, Queue *queue);
+void queue(char *db_file, char **query, char *req);
+void queue_commands(char **query, Queue *queue, char *req);
 void QPUSH(Queue *queue, char *element);
 char *QPOP(Queue *queue);
 void write_queue(char *filename, Queue *queue, char *struct_name,

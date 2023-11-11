@@ -1,4 +1,4 @@
-#include "set.h"
+#include "list.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,21 +6,21 @@
 
 #include "macro.h"
 
-// This function implements the set operation
-void set(char *db_file, char **query) {
+// This function implements the list operation
+void list(char *db_file, char **query, char *req) {
   char **line = malloc(MAX_LEN * sizeof(char *));
   int size = 0;
   int isnt_empty = 0;
 
   Set *set = createSet(MAX_LEN);
-  STRUCT(line, db_file, isnt_empty, query[1], size, "set:");
+  STRUCT(line, db_file, isnt_empty, query[1], size, "list:");
   if (isnt_empty) {
     for (int i = 1; i < size; i++) {
       SADD(set, line[i]);
     }
   }
-  set_commands(query, set);
-  write_set(db_file, set, query[1], "set:");
+  set_commands(query, set, req);
+  write_set(db_file, set, query[1], "list:");
   free_set(set);
   for (int i = 0; i < size; i++) {
     free(line[i]);
@@ -29,16 +29,16 @@ void set(char *db_file, char **query) {
 }
 
 // Executes the set commands based on the given query
-void set_commands(char **query, Set *set) {
+void set_commands(char **query, Set *set, char *req) {
   if (!strcmp(query[0], "SADD")) {
-    printf("-> %s\n", SADD(set, query[2]));
+    strcpy(req, SADD(set, query[2]));
   } else if (!strcmp(query[0], "SREM")) {
-    printf("-> %s\n", SREM(set, query[2]));
+    strcpy(req, SREM(set, query[2]));
   } else if (!strcmp(query[0], "SISMEMBER")) {
     if (!SISMEMBER(set, query[2]))
-      printf("\n-> FALSE\n");
+      strcpy(req, "FALSE");
     else
-      printf("\n-> TRUE\n");
+      strcpy(req, "TRUE");
   } else {
     ERROR;
   }
