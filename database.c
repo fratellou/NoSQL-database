@@ -110,8 +110,8 @@ void handle_client(int client_socket) {
 
 void request(char *db_file, char **query, char *req) {
   pthread_mutex_lock(&mutex);
-  if (!strcmp(query[0], "SADD") || !strcmp(query[0], "SREM") ||
-      !strcmp(query[0], "SISMEMBER")) {
+  if (!strcmp(query[0], "LADD") || !strcmp(query[0], "LINS") ||
+      !strcmp(query[0], "LDEL") || !strcmp(query[0], "LREM") || !strcmp(query[0], "LGET")) {
     list(db_file, query, req);
   } else if (!strcmp(query[0], "SPUSH") || !strcmp(query[0], "SPOP")) {
     stack(db_file, query, req);

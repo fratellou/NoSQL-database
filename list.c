@@ -12,16 +12,18 @@ void list(char *db_file, char **query, char *req) {
   int size = 0;
   int isnt_empty = 0;
 
-  Set *set = createSet(MAX_LEN);
+  Node_list* head = NULL;
   STRUCT(line, db_file, isnt_empty, query[1], size, "list:");
   if (isnt_empty) {
-    for (int i = 1; i < size; i++) {
-      SADD(set, line[i]);
+    for (int i = size-1; i > 0; i--) {
+      head = LADD(head, line[i]);
     }
   }
-  set_commands(query, set, req);
-  write_set(db_file, set, query[1], "list:");
-  free_set(set);
+  
+  list_commands(query, &head, req);
+  printf("%s\n", head->element);
+
+  write_list(db_file, head, query[1], "list:");
   for (int i = 0; i < size; i++) {
     free(line[i]);
   }
@@ -29,93 +31,135 @@ void list(char *db_file, char **query, char *req) {
 }
 
 // Executes the set commands based on the given query
-void set_commands(char **query, Set *set, char *req) {
-  if (!strcmp(query[0], "SADD")) {
-    strcpy(req, SADD(set, query[2]));
-  } else if (!strcmp(query[0], "SREM")) {
-    strcpy(req, SREM(set, query[2]));
-  } else if (!strcmp(query[0], "SISMEMBER")) {
-    if (!SISMEMBER(set, query[2]))
-      strcpy(req, "FALSE");
-    else
-      strcpy(req, "TRUE");
+void list_commands(char **query, Node_list **head, char *req) {
+  if (!strcmp(query[0], "LADD")) {
+    *head = LADD(*head, query[2]);
+    strcpy(req, (*head)->element);
+  } else if (!strcmp(query[0], "LINS")){
+    char* element = malloc(sizeof(char) * MAX_LEN);
+    *head = LINS(*head, query[2], atoi(query[3]), element);
+    strcpy(req, element);
+    free(element);
+  } else if (!strcmp(query[0], "LREM")) {
+    char* element = malloc(sizeof(char) * MAX_LEN);
+    *head = LREM(*head, atoi(query[2]), element);
+    strcpy(req, element);
+    free(element);
+  } else if (!strcmp(query[0], "LDEL")) {
+    char* element = malloc(sizeof(char) * MAX_LEN);
+    *head = LDEL(*head, element);
+    strcpy(req, element);
+    free(element);
+  } else if (!strcmp(query[0], "LGET")) {
+    sprintf(req, "%d", LGET(*head, query[2]));
   } else {
     ERROR;
   }
 }
 
-// Creates and initializes a new set data structure
-Set *createSet(int size) {
-  Set *set = (Set *)malloc(sizeof(Set));
-  set->size = size;
-  set->buckets = malloc(sizeof(Node_set **) * size);
-  for (int i = 0; i < size; i++) {
-    set->buckets[i] = NULL;
-  }
-  return set;
+// Creates and initializes a new list data structure
+Node_list* createList(char* data) {
+    Node_list* newNode = (Node_list*)malloc(sizeof(Node_list));
+    newNode->element = data;
+    newNode->next = NULL;
+    return newNode;
 }
 
-// Calculates the hash value for a given key
-int set_calc(char *key) {
-  int hash = 0;
-  for (int i = 0; i < (int)strlen(key); i++) {
-    hash += (int)key[i];
-  }
-  return hash % MAX_LEN;
-}
-
-// Adds an element to the set
-char *SADD(Set *set, char *element) {
-  int index = set_calc(element);
-  if (set->buckets[index] != NULL) {
-    ERROR;
-    return NULL;
-  }
-  Node_set *newNode = (Node_set *)malloc(sizeof(Node_set));
-  newNode->element = element;
-  newNode->next = set->buckets[index];
-  set->buckets[index] = newNode;
-  return element;
-}
-
-// Removes an element from the set
-char *SREM(Set *set, char *element) {
-  int index = set_calc(element);
-  Node_set *current = set->buckets[index];
-  Node_set *previous = NULL;
-  while (current != NULL) {
-    if (strcmp(current->element, element) == 0) {
-      if (previous != NULL) {
-        previous->next = current->next;
-      } else {
-        set->buckets[index] = current->next;
-      }
-      char *element = current->element;
-      free(current);
-      return element;
+// Function to add an element to the begin of the list
+Node_list* LADD(Node_list* head, char* data) {
+    Node_list* newNode = createList(data);
+    if (head == NULL) {
+        head = newNode;
+    } else {
+        newNode->next = head;
+        head = newNode;
     }
-    previous = current;
-    current = current->next;
-  }
-  return NULL;
+    return head;
 }
 
-// Checks if an element is a member of the set
-int SISMEMBER(Set *set, char *element) {
-  int index = set_calc(element);
-  Node_set *current = set->buckets[index];
-  while (current != NULL) {
-    if (strcmp(current->element, element) == 0) {
-      return 1;
+// Function for adding an element by index
+Node_list* LINS(Node_list* head, char* data, int index, char *element) {
+    Node_list* newNode = createList(data);
+    if (head == NULL && index == 0) {
+        strcpy(element, data);
+        head = newNode;
+    } else {
+        Node_list* current = head;
+        Node_list* previous = NULL;
+        int count = 0;
+        while (current != NULL && count < index) {
+            previous = current;
+            current = current->next;
+            count++;
+        }
+        if (count == index) {
+            strcpy(element, data);
+            newNode->next = current;
+            previous->next = newNode;
+        } 
+        else strcpy(element, "n/a");
     }
-    current = current->next;
-  }
-
-  return 0;
+    return head;
+}
+//Function to remove an item from the beginning of the list
+Node_list* LDEL(Node_list* head, char* element) {
+    if (head == NULL) {
+        element = NULL;
+        return NULL;
+    } else {
+        strcpy(element, head->element);
+        head = head->next;
+    }
+    return head;
 }
 
-// Writes the updated set data structure to the database file
-void write_set(char *filename, Set *set, char *struct_name, char *struct_type) {
+//Function for deleting an element by index
+Node_list* LREM(Node_list* head, int index, char* element) {
+    if (head == NULL) {
+        element = NULL;
+    } else {
+        Node_list* current = head;
+        Node_list* previous = NULL;
+        int count = 0;
+        while (current != NULL && count < index) {
+            previous = current;
+            current = current->next;
+            count++;
+        }
+        if (count == index) {
+            if (previous == NULL) {
+                strcpy(element, head->element);
+                head = current->next;
+            } else {
+                strcpy(element, current->element);
+                previous->next = current->next;
+            }
+        } 
+        else strcpy(element, "n/a");
+    }
+    return head;
+}
+
+// Function to search for an item in the list
+int LGET(Node_list* head, char* element) {
+    Node_list* current = head;
+    int index = 0;
+    if (current == NULL) {
+        return -1;
+    }
+    while (current != NULL && strcmp(current->element, element) != 0) {
+        current = current->next;
+        index++;
+    }
+    if (current == NULL) {
+        return -1;
+    } else {
+        return index;
+    }
+}
+
+// Writes the updated list data structure to the database file
+void write_list(char *filename, Node_list *head, char *struct_name, char *struct_type) {
   FILE *temp = fopen("temp.txt", "a+");
   FILE *fp = fopen(filename, "r");
   if (fp && temp) {
@@ -128,10 +172,9 @@ void write_set(char *filename, Set *set, char *struct_name, char *struct_type) {
       char *second_word = strtok(NULL, " ");
       if (new_input == 0) {
         fprintf(temp, "%s %s ", struct_type, struct_name);
-        for (int i = 0; i < MAX_LEN; i++) {
-          if (set->buckets[i] != NULL) {
-            fprintf(temp, "%s ", set->buckets[i]->element);
-          }
+        while(head != NULL) {
+          fprintf(temp, "%s ", head->element);
+          head = head->next;
         }
         fprintf(temp, "\n");
         new_input = 1;
@@ -150,18 +193,4 @@ void write_set(char *filename, Set *set, char *struct_name, char *struct_type) {
   }
   fclose(fp);
   fclose(temp);
-}
-
-// Frees the memory allocated for the set data structure
-void free_set(Set *set) {
-  if (set == NULL) {
-    return;
-  }
-  for (int i = 0; i < set->size; i++) {
-    if (set->buckets[i] != NULL) {
-      free(set->buckets[i]);
-    }
-  }
-  free(set->buckets);
-  free(set);
 }
