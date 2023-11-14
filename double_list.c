@@ -6,131 +6,209 @@
 
 #include "macro.h"
 
-// This function implements the double linked set operation
-void Dlist(char *db_file, char **query, char *req) {
-  char **line = malloc(MAX_LEN * sizeof(char *));
+// This function implements the list operation
+void Dlist(char* db_file, char** query, char* req) {
+  char** line = malloc(MAX_LEN * sizeof(char*));
   int size = 0;
   int isnt_empty = 0;
-  DSet *set = createDSet(MAX_LEN);
-  STRUCT(line, db_file, isnt_empty, query[1], size, "dset:");
+
+  DList* list = createDList();
+  STRUCT(line, db_file, isnt_empty, query[1], size, "Dlist:");
   if (isnt_empty) {
-    for (int i = 1; i < size; i++) {
-      DSADD(set, line[i]);
+    for (int i = size - 1; i > 0; i--) {
+      list = DLADD(list, line[i]);
     }
   }
-  Dset_commands(query, set, req);
-  write_Dset(db_file, set, query[1], "dset:");
-  free_Dset(set);
+
+  Dlist_commands(query, &list, req);
+  write_Dlist(db_file, list->head, query[1], "Dlist:");
   for (int i = 0; i < size; i++) {
     free(line[i]);
   }
   free(line);
 }
 
-// This function takes a query and a double linked set object as parameters and
-// executes the command specified in the query
-void Dset_commands(char **query, DSet *set, char *req) {
-  if (!strcmp(query[0], "DSADD")) {
-    strcpy(req, DSADD(set, query[2]));
-  } else if (!strcmp(query[0], "DSREM")) {
-    strcpy(req, DSREM(set, query[2]));
-  } else if (!strcmp(query[0], "DSISMEMBER")) {
-    if (!DSISMEMBER(set, query[2]))
-      strcpy(req, "FALSE");
-    else
-      strcpy(req, "TRUE");
+// Executes the set commands based on the given query
+void Dlist_commands(char** query, DList** list, char* req) {
+  if (!strcmp(query[0], "DLADD")) {
+    *list = DLADD(*list, query[2]);
+    strcpy(req, (*list)->head->element);
+  } else if (!strcmp(query[0], "DLINS")) {
+    char* element = malloc(sizeof(char) * MAX_LEN);
+    *list = DLINS(*list, query[2], atoi(query[3]), element);
+    strcpy(req, element);
+    free(element);
+  } else if (!strcmp(query[0], "DLREM")) {
+    char* element = malloc(sizeof(char) * MAX_LEN);
+    (*list)->head = DLREM((*list)->head, atoi(query[2]), element);
+    strcpy(req, element);
+    free(element);
+  } else if (!strcmp(query[0], "DLDEL")) {
+    char* element = malloc(sizeof(char) * MAX_LEN);
+    (*list)->head = DLDEL((*list)->head, element);
+    strcpy(req, element);
+    free(element);
+  } else if (!strcmp(query[0], "DLGET")) {
+    sprintf(req, "%d", DLGET((*list)->head, query[2]));
   } else {
     ERROR;
   }
 }
 
-// This function creates a new double linked set
-DSet *createDSet(int size) {
-  DSet *set = (DSet *)malloc(sizeof(DSet));
-  set->size = size;
-  set->buckets = malloc(sizeof(Node_Dset **) * size);
-  for (int i = 0; i < size; i++) {
-    set->buckets[i] = NULL;
-  }
-  return set;
+// Creates and initializes a new list data structure
+DList* createDList() {
+  DList* list = (DList*)malloc(sizeof(DList));
+  list->head = NULL;
+  list->tail = NULL;
+  return list;
 }
 
-// This function calculates the hash value for a given key
-int Dset_calc(char *key) {
-  int hash = 0;
-  for (int i = 0; i < (int)strlen(key); i++) {
-    hash += (int)key[i];
-  }
-  return hash % MAX_LEN;
-}
-
-// This function adds an element to the double linked set
-char *DSADD(DSet *set, char *element) {
-  int index = Dset_calc(element);
-  if (set->buckets[index] != NULL) {
-    ERROR;
-    return NULL;
-  }
-  Node_Dset *newNode = (Node_Dset *)malloc(sizeof(Node_Dset));
-  newNode->element = element;
+Node_Dlist* createNode(char* data) {
+  Node_Dlist* newNode = (Node_Dlist*)malloc(sizeof(Node_Dlist));
+  newNode->element = data;
   newNode->prev = NULL;
-  newNode->next = set->buckets[index];
-  if (set->buckets[index] != NULL) {
-    set->buckets[index]->prev = newNode;
-  }
-  set->buckets[index] = newNode;
-  return element;
+  newNode->next = NULL;
+  return newNode;
 }
 
-// This function removes an element from the double linked set
-char *DSREM(DSet *set, char *element) {
-  int index = Dset_calc(element);
-  if (set->buckets[index] == NULL) {
+// Function to add an element to the begin of the list
+DList* DLADD(DList* list, char* data) {
+  Node_Dlist* newNode = createNode(data);
+  if (list->head == NULL) {
+    list->head = newNode;
+    list->tail = newNode;
+  } else {
+    newNode->next = list->head;
+    list->head->prev = newNode;
+    list->head = newNode;
+  }
+  return list;
+}
+
+// Function for adding an element by index
+DList* DLINS(DList* list, char* data, int index, char* element) {
+  Node_Dlist* newNode = createNode(data);
+  if (list->head == NULL && index == 0) {
+    strcpy(element, data);
+    list->head = newNode;
+    list->tail = newNode;
+  } else {
+    Node_Dlist* current = list->head;
+    Node_Dlist* previous = NULL;
+    int count = 0;
+    while (current != NULL && count < index) {
+      previous = current;
+      current = current->next;
+      count++;
+    }
+    if (count == index) {
+      strcpy(element, data);
+      newNode->next = current;
+      newNode->prev = previous;
+      if (current != NULL) {
+        current->prev = newNode;
+      } else {
+        list->tail = newNode;
+      }
+      if (previous != NULL) {
+        previous->next = newNode;
+      } else {
+        list->head = newNode;
+      }
+    } else {
+      strcpy(element, "n/a");
+    }
+  }
+  return list;
+}
+
+// Function to remove an item from the beginning of the list
+Node_Dlist* DLDEL(Node_Dlist* head, char* element) {
+  if (head == NULL) {
+    strcpy(element, "n/a");
     return NULL;
   } else {
-    char *element = set->buckets[index]->element;
-    Node_Dset *nextNode = set->buckets[index]->next;
-    Node_Dset *prevNode = set->buckets[index]->prev;
+    strcpy(element, head->element);
+    Node_Dlist* nextNode = head->next;
     if (nextNode != NULL) {
-      nextNode->prev = prevNode;
+      nextNode->prev = NULL;
+      head->next = NULL;
+      nextNode->prev = nextNode;
     }
-    if (prevNode != NULL) {
-      prevNode->next = nextNode;
-    }
-    set->buckets[index] = NULL;
-    return element;
+    head = nextNode;
   }
-  return NULL;
+  return head;
 }
 
-// This function checks if an element is a member of the double linked set
-int DSISMEMBER(DSet *set, char *element) {
-  int index = Dset_calc(element);
-  if (set->buckets[index] == NULL) return 0;
-  if (strcmp(set->buckets[index]->element, element) == 0) {
-    return 1;
+// Function for deleting an element by index
+Node_Dlist* DLREM(Node_Dlist* head, int index, char* element) {
+  if (head == NULL) {
+    strcpy(element, "n/a");
+  } else {
+    Node_Dlist* current = head;
+    Node_Dlist* previous = NULL;
+    int count = 0;
+    while (current != NULL && count < index) {
+      previous = current;
+      current = current->next;
+      count++;
+    }
+    if (count == index) {
+      strcpy(element, current->element);
+      if (previous == NULL) {
+        head = current->next;
+        if (head != NULL) {
+          head->prev = NULL;
+        }
+      } else {
+        previous->next = current->next;
+        if (current->next != NULL) {
+          current->next->prev = previous;
+        }
+      }
+    } else {
+      strcpy(element, "n/a");
+    }
   }
-  return 0;
+  return head;
 }
 
-// This function writes the contents of the double linked set to a file
-void write_Dset(char *filename, DSet *set, char *struct_name,
-                char *struct_type) {
-  FILE *temp = fopen("temp.txt", "a+");
-  FILE *fp = fopen(filename, "r");
+// Function to search for an item in the list
+int DLGET(Node_Dlist* head, char* element) {
+  Node_Dlist* current = head;
+  int index = 0;
+  if (current == NULL) {
+    return -1;
+  }
+  while (current != NULL && strcmp(current->element, element) != 0) {
+    current = current->next;
+    index++;
+  }
+  if (current == NULL) {
+    return -1;
+  } else {
+    return index;
+  }
+}
+
+// Writes the updated list data structure to the database file
+void write_Dlist(char* filename, Node_Dlist* head, char* struct_name,
+                 char* struct_type) {
+  FILE* temp = fopen("temp.txt", "a+");
+  FILE* fp = fopen(filename, "r");
   if (fp && temp) {
     char string[MAX_LEN];
     int new_input = 0;
     while (fgets(string, MAX_LEN, fp) != NULL) {
       char new_string[MAX_LEN];
       strcpy(new_string, string);
-      char *istr = strtok(string, " ");
-      char *second_word = strtok(NULL, " ");
+      char* istr = strtok(string, " ");
+      char* second_word = strtok(NULL, " ");
       if (new_input == 0) {
         fprintf(temp, "%s %s ", struct_type, struct_name);
-        for (int i = 0; i < MAX_LEN; i++) {
-          if (set->buckets[i] != NULL)
-            fprintf(temp, "%s ", set->buckets[i]->element);
+        while (head != NULL) {
+          fprintf(temp, "%s ", head->element);
+          head = head->next;
         }
         fprintf(temp, "\n");
         new_input = 1;
@@ -149,19 +227,4 @@ void write_Dset(char *filename, DSet *set, char *struct_name,
   }
   fclose(fp);
   fclose(temp);
-}
-
-// This function frees the memory allocated for the double linked set object and
-// its buckets
-void free_Dset(DSet *set) {
-  if (set == NULL) {
-    return;
-  }
-  for (int i = 0; i < set->size; i++) {
-    if (set->buckets[i] != NULL) {
-      free(set->buckets[i]);
-    }
-  }
-  free(set->buckets);
-  free(set);
 }

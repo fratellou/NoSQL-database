@@ -1,25 +1,27 @@
-#ifndef DSET_H
-#define DSET_H
+#ifndef DLIST_H
+#define DLIST_H
 
-typedef struct Node_Dset {
-  char *element;
-  struct Node_Dset *prev;
-  struct Node_Dset *next;
-} Node_Dset;
+typedef struct Node_Dlist {
+  char* element;
+  struct Node_Dlist* prev;
+  struct Node_Dlist* next;
+} Node_Dlist;
 
-typedef struct DSet {
-  Node_Dset **buckets;
-  int size;
-} DSet;
+typedef struct DList {
+  Node_Dlist* head;
+  Node_Dlist* tail;
+} DList;
 
-void Dlist(char *db_file, char **query, char *req);
-void Dset_commands(char **query, DSet *set, char *req);
-DSet *createDSet(int size);
-int Dset_calc(char *key);
-char *DSADD(DSet *set, char *element);
-char *DSREM(DSet *set, char *element);
-int DSISMEMBER(DSet *set, char *element);
-void write_Dset(char *filename, DSet *set, char *struct_name,
-                char *struct_type);
-void free_Dset(DSet *set);
+void Dlist(char* db_file, char** query, char* req);
+void Dlist_commands(char** query, DList** list, char* req);
+DList* createDList();
+Node_Dlist* createNode(char* data);
+DList* DLADD(DList* list, char* data);
+DList* DLINS(DList* list, char* data, int index, char* element);
+Node_Dlist* DLDEL(Node_Dlist* head, char* element);
+Node_Dlist* DLREM(Node_Dlist* head, int index, char* element);
+int DLGET(Node_Dlist* head, char* element);
+void write_Dlist(char* filename, Node_Dlist* head, char* struct_name,
+                 char* struct_type);
+
 #endif

@@ -111,7 +111,8 @@ void handle_client(int client_socket) {
 void request(char *db_file, char **query, char *req) {
   pthread_mutex_lock(&mutex);
   if (!strcmp(query[0], "LADD") || !strcmp(query[0], "LINS") ||
-      !strcmp(query[0], "LDEL") || !strcmp(query[0], "LREM") || !strcmp(query[0], "LGET")) {
+      !strcmp(query[0], "LDEL") || !strcmp(query[0], "LREM") ||
+      !strcmp(query[0], "LGET")) {
     list(db_file, query, req);
   } else if (!strcmp(query[0], "SPUSH") || !strcmp(query[0], "SPOP")) {
     stack(db_file, query, req);
@@ -120,8 +121,9 @@ void request(char *db_file, char **query, char *req) {
   } else if (!strcmp(query[0], "HSET") || !strcmp(query[0], "HDEL") ||
              !strcmp(query[0], "HGET")) {
     hash(db_file, query, req);
-  } else if (!strcmp(query[0], "DSADD") || !strcmp(query[0], "DSREM") ||
-             !strcmp(query[0], "DSISMEMBER")) {
+  } else if (!strcmp(query[0], "DLADD") || !strcmp(query[0], "DLINS") ||
+             !strcmp(query[0], "DLDEL") || !strcmp(query[0], "DLREM") ||
+             !strcmp(query[0], "DLGET")) {
     Dlist(db_file, query, req);
   } else if (!strcmp(query[0], "ARADD") || !strcmp(query[0], "ARREM") ||
              !strcmp(query[0], "ARDEL") || !strcmp(query[0], "ARINS") ||
