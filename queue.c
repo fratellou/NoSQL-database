@@ -82,9 +82,7 @@ void write_queue(char *filename, Queue *queue, char *struct_name,
         fprintf(temp, "%s %s ", struct_type, struct_name);
         for (int i = 0; i < queue->size; i++) {
           fprintf(temp, "%s ", queue->head->data);
-          Node_que *temp_node = queue->head;
           queue->head = queue->head->next;
-          free(temp_node->data);
         }
         fprintf(temp, "\n");
         new_input = 1;

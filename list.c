@@ -48,8 +48,19 @@ void list_commands(char** query, Node_list** head, char* req) {
     *head = LDEL(*head, element);
     strcpy(req, element);
     free(element);
+  } else if (!strcmp(query[0], "LDEL_VAL")) {
+    char* element = malloc(sizeof(char) * MAX_LEN);
+    *head = LDEL_VAL(*head, query[2], element);
+    strcpy(req, element);
+    free(element);
   } else if (!strcmp(query[0], "LGET")) {
     sprintf(req, "%d", LGET(*head, query[2]));
+  } else if (!strcmp(query[0], "LISMEMBER")) {
+    int index = LGET(*head, query[2]);
+    if (index != -1)
+      strcpy(req, "TRUE");
+    else
+      strcpy(req, "FALSE");
   } else {
     ERROR;
   }
@@ -99,6 +110,27 @@ Node_list* LINS(Node_list* head, char* data, int index, char* element) {
   }
   return head;
 }
+
+// Deletes an element from the list based on its value
+Node_list* LDEL_VAL(Node_list* head, char* value, char* element) {
+  Node_list *current = head, *prev = NULL;
+  while (current != NULL) {
+    if (strcmp(current->element, value) == 0) {
+      strcpy(element, value);
+      if (prev == NULL) {
+        head = current->next;
+      } else {
+        prev->next = current->next;
+      }
+      break;
+    }
+    prev = current;
+    current = current->next;
+  }
+
+  return head;
+}
+
 // Function to remove an item from the beginning of the list
 Node_list* LDEL(Node_list* head, char* element) {
   if (head == NULL) {

@@ -35,6 +35,7 @@ void tree(char *db_file, char **query, char *req) {
 void tree_commands(char **query, Node_tree **root, char *req) {
   if (!strcmp(query[0], "TADD")) {
     *root = TADD(*root, atoi(query[2]));
+    strcpy(req, query[2]);
   } else if (!strcmp(query[0], "TSRCH")) {
     Node_tree *search = TSRCH(*root, atoi(query[2]));
     if (search != NULL) {
@@ -43,6 +44,7 @@ void tree_commands(char **query, Node_tree **root, char *req) {
       strcpy(req, "FALSE");
   } else if (!strcmp(query[0], "TDEL")) {
     *root = TDEL(*root, atoi(query[2]));
+    strcpy(req, query[2]);
   } else {
     ERROR;
   }

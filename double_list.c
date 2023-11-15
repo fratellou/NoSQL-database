@@ -38,6 +38,9 @@ void Dlist_commands(char** query, DList** list, char* req) {
     *list = DLINS(*list, query[2], atoi(query[3]), element);
     strcpy(req, element);
     free(element);
+  } else if (!strcmp(query[0], "DLADDR")) {
+    *list = DLADDR(*list, query[2]);
+    strcpy(req, (*list)->tail->element);
   } else if (!strcmp(query[0], "DLREM")) {
     char* element = malloc(sizeof(char) * MAX_LEN);
     (*list)->head = DLREM((*list)->head, atoi(query[2]), element);
@@ -50,6 +53,22 @@ void Dlist_commands(char** query, DList** list, char* req) {
     free(element);
   } else if (!strcmp(query[0], "DLGET")) {
     sprintf(req, "%d", DLGET((*list)->head, query[2]));
+  } else if (!strcmp(query[0], "DLDEL_VAL")) {
+    char* element = malloc(sizeof(char) * MAX_LEN);
+    *list = DLDEL_VAL(*list, query[2], element);
+    strcpy(req, element);
+    free(element);
+  } else if (!strcmp(query[0], "DLREMR")) {
+    char* element = malloc(sizeof(char) * MAX_LEN);
+    (*list)->tail = DLREMR((*list)->tail, element);
+    strcpy(req, element);
+    free(element);
+  } else if (!strcmp(query[0], "DLISMEMBER")) {
+    int index = DLGET((*list)->head, query[2]);
+    if (index != -1)
+      strcpy(req, "TRUE");
+    else
+      strcpy(req, "FALSE");
   } else {
     ERROR;
   }
@@ -82,6 +101,27 @@ DList* DLADD(DList* list, char* data) {
     list->head->prev = newNode;
     list->head = newNode;
   }
+  return list;
+}
+
+// Function to add an element to the end of the list
+DList* DLADDR(DList* list, char* data) {
+  Node_Dlist* newNode = createNode(data);
+  if (list->tail == NULL) {
+    list->head = newNode;
+    list->tail = newNode;
+  } else {
+    list->tail->next = newNode;
+    newNode->prev = list->tail;
+    list->tail = newNode;
+  }
+  return list;
+}
+
+// Removes given value from the doubly linked list and returns the updated node
+DList* DLDEL_VAL(DList* list, char* value, char* element) {
+  int index = DLGET(list->head, value);
+  list->head = DLREM(list->head, index, element);
   return list;
 }
 
@@ -120,6 +160,24 @@ DList* DLINS(DList* list, char* data, int index, char* element) {
     }
   }
   return list;
+}
+
+// Removes a node from the end of the doubly linked list
+Node_Dlist* DLREMR(Node_Dlist* tail, char* element) {
+  if (tail == NULL) {
+    strcpy(element, "n/a");
+    return NULL;
+  } else {
+    strcpy(element, tail->element);
+    Node_Dlist* nextNode = tail->next;
+    if (nextNode != NULL) {
+      nextNode->prev = NULL;
+      tail->next = NULL;
+      nextNode->prev = nextNode;
+    }
+    tail = nextNode;
+  }
+  return tail;
 }
 
 // Function to remove an item from the beginning of the list
