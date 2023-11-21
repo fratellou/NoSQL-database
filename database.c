@@ -16,6 +16,7 @@
 #include "queue.h"
 #include "stack.h"
 #include "tree.h"
+#include "set.h"
 
 #define PORT 6379
 pthread_mutex_t mutex;
@@ -136,6 +137,9 @@ void request(char *db_file, char **query, char *req) {
   } else if (!strcmp(query[0], "TADD") || !strcmp(query[0], "TSRCH") ||
              !strcmp(query[0], "TDEL")) {
     tree(db_file, query, req);
+  } else if (!strcmp(query[0], "SADD") || !strcmp(query[0], "SREM") ||
+             !strcmp(query[0], "SISMEMBER")) {
+    set(db_file, query, req);
   } else
     ERROR;
   pthread_mutex_unlock(&mutex);

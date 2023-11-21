@@ -2,8 +2,8 @@ CFLAGS=-Wall -Wextra -Werror
 
 all:server client
 
-server: database.o hash.o stack.o array.o list.o tree.o queue.o hash.o double_list.o 
-	gcc $(CFLAGS) database.o hash.o array.o tree.o stack.o list.o queue.o double_list.o -o server
+server: database.o hash.o stack.o array.o list.o tree.o queue.o hash.o double_list.o set.o
+	gcc $(CFLAGS) database.o hash.o array.o tree.o stack.o list.o queue.o double_list.o set.o -o server
 
 client: client.o
 	gcc $(CFLAGS) client.o -o dbms
@@ -25,6 +25,9 @@ list.o: macro.h list.h list.c
 
 double_list.o: macro.h double_list.h double_list.c
 	gcc $(CFLAGS) -c double_list.c
+
+set.o: macro.h set.h set.c
+	gcc $(CFLAGS) -c set.c
 
 queue.o: macro.h queue.h queue.c 
 	gcc $(CFLAGS) -c queue.c
