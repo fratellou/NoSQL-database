@@ -8,15 +8,15 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include "array.h"
-#include "double_list.h"
-#include "hash.h"
-#include "list.h"
+#include "./structures/array.h"
+#include "./structures/double_list.h"
+#include "./structures/hash.h"
+#include "./structures/list.h"
 #include "macro.h"
-#include "queue.h"
-#include "stack.h"
-#include "tree.h"
-#include "set.h"
+#include "./structures/queue.h"
+#include "./structures/stack.h"
+#include "./structures/tree.h"
+#include "./structures/set.h"
 
 #define PORT 6379
 pthread_mutex_t mutex;

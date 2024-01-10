@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "macro.h"
+#include "../macro.h"
 
 // This function implements the hash operation
 void hash(char *db_file, char **query, char *req) {
@@ -54,11 +54,11 @@ HashTable *createHashTable(int size) {
 
 // Function to calculate the hash value for a given key
 int hash_calc(char *key) {
-  int hash = 0;
+  int hash_val = 0;
   for (int i = 0; i < (int)strlen(key); i++) {
-    hash += (int)key[i];
+    hash_val += (int)key[i];
   }
-  return hash % MAX_LEN;
+  return hash_val % MAX_LEN;
 }
 
 // Function to insert or update a key-value pair in the hash table
@@ -159,11 +159,12 @@ void write_hash(char *filename, HashTable *hashtable, char *struct_name,
     }
     remove(filename);
     rename("temp.txt", filename);
+    fclose(fp);
+    fclose(temp);
   } else {
     ERROR;
   }
-  fclose(fp);
-  fclose(temp);
+
 }
 
 // Frees the memory used by the hash table and its elements

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "macro.h"
+#include "../macro.h"
 
 // This function implements the list operation
 void list(char* db_file, char** query, char* req) {
@@ -219,9 +219,10 @@ void write_list(char* filename, Node_list* head, char* struct_name,
     }
     remove(filename);
     rename("temp.txt", filename);
+    fclose(fp);
+    fclose(temp);
   } else {
     ERROR;
   }
-  fclose(fp);
-  fclose(temp);
+
 }

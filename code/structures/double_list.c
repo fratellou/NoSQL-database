@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "macro.h"
+#include "../macro.h"
 
 // This function implements the list operation
 void Dlist(char* db_file, char** query, char* req) {
@@ -280,9 +280,10 @@ void write_Dlist(char* filename, Node_Dlist* head, char* struct_name,
     }
     remove(filename);
     rename("temp.txt", filename);
+    fclose(fp);
+    fclose(temp);
   } else {
     ERROR;
   }
-  fclose(fp);
-  fclose(temp);
+
 }

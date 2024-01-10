@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "macro.h"
+#include "../macro.h"
 
 // This function implements the stack operation
 void stack(char *db_file, char **query, char *request) {
@@ -94,9 +94,10 @@ void write_stack(char *filename, Stack *stack, char *struct_name,
     }
     remove(filename);
     rename("temp.txt", filename);
+    fclose(fp);
+    fclose(temp);
   } else {
     ERROR;
   }
-  fclose(fp);
-  fclose(temp);
+
 }

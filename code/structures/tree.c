@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "macro.h"
+#include "../macro.h"
 
 // This function is responsible for managing the operations on the tree
 void tree(char *db_file, char **query, char *req) {
@@ -227,9 +227,10 @@ void write_tree(char *filename, Node_tree **root, char *struct_name,
     }
     remove(filename);
     rename("temp.txt", filename);
+    fclose(fp);
+    fclose(temp);
   } else {
     ERROR;
   }
-  fclose(fp);
-  fclose(temp);
+
 }

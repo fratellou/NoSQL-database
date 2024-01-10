@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "macro.h"
+#include "../macro.h"
 
 // This function implements the set operation
 void set(char *db_file, char **query, char *req) {
@@ -46,13 +46,13 @@ void set_commands(char **query, Set *set, char *req) {
 
 // Creates and initializes a new set data structure
 Set *createSet(int size) {
-  Set *set = (Set *)malloc(sizeof(Set));
-  set->size = size;
-  set->buckets = malloc(sizeof(Node_set **) * size);
+  Set *new_set = (Set *)malloc(sizeof(Set));
+  new_set->size = size;
+  new_set->buckets = malloc(sizeof(Node_set **) * size);
   for (int i = 0; i < size; i++) {
-    set->buckets[i] = NULL;
+    new_set->buckets[i] = NULL;
   }
-  return set;
+  return new_set;
 }
 
 // Calculates the hash value for a given key
@@ -90,9 +90,9 @@ char *SREM(Set *set, char *element) {
       } else {
         set->buckets[index] = current->next;
       }
-      char *element = current->element;
+      char *rem_element = current->element;
       free(current);
-      return element;
+      return rem_element;
     }
     previous = current;
     current = current->next;
@@ -145,11 +145,12 @@ void write_set(char *filename, Set *set, char *struct_name, char *struct_type) {
     }
     remove(filename);
     rename("temp.txt", filename);
+    fclose(fp);
+    fclose(temp);
   } else {
     ERROR;
   }
-  fclose(fp);
-  fclose(temp);
+
 }
 
 // Frees the memory allocated for the set data structure

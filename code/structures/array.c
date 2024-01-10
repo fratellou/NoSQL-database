@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "macro.h"
+#include "../macro.h"
 
 // This function implements the array operation
 void array(char *db_file, char **query, char *req) {
@@ -52,10 +52,10 @@ void array_commands(char **query, Array *array, char *req) {
 
 // Function to create an array
 Array *createArray(int size) {
-  Array *array = (Array *)malloc(sizeof(Array));
-  array->data = (int *)malloc(size * sizeof(int));
-  array->size = 0;
-  return array;
+  Array *new_array = (Array *)malloc(sizeof(Array));
+  new_array->data = (int *)malloc(size * sizeof(int));
+  new_array->size = 0;
+  return new_array;
 }
 
 // Function to add an element to the end of the array
@@ -167,9 +167,10 @@ void write_array(char *filename, Array *arr, char *struct_name,
     }
     remove(filename);
     rename("temp.txt", filename);
+    fclose(fp);
+    fclose(temp);
   } else {
     ERROR;
   }
-  fclose(fp);
-  fclose(temp);
+
 }
