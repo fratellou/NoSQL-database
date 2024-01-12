@@ -12,7 +12,7 @@ To develop a NoSQL DBMS that meets the following requirements:
 - Binary tree
 
 2. The DBMS saves all data to the specified file. 
-3. The DBMS has a console interface that meets the following requirement. ./ <your program name> --file <the path to the data file> -- query <DBMS request>. 
+3. The DBMS has a console interface that meets the following requirement. ./ <your_program_name> --file <the_path_to_the_data_file> -- query <DBMS_request>. 
 
 | Data type | ADD | REMOVE | READ | 
 | ------ | ------ | ------ | ------ |
