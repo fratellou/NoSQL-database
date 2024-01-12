@@ -1,29 +1,29 @@
 # NoSQL-database
 
-Разработать no-SQL СУБД, отвечающую следующим требованиям: 
-1.	База данных умеет хранить данные в следующих контейнерах: 
-- Стэк 
-- Очередь 
-- Хэш-таблица
-- Множество 
-- Массив
-- Односвязный список
-- Двусвязный список
-- Бинарное дерево
+To develop a NoSQL DBMS that meets the following requirements:
+1. The database can store data in the following containers:
+- Stack
+- Queue
+- Hash table
+- A lot of
+- Array
+- A single-linked list
+- A doubly linked list
+- Binary tree
 
-2.	Все данные СУБД сохраняет в указанный файл. 
-3.	СУБД имеет консольный интерфейс удовлетворяющий следующему требованию. ./ <имя вашей программы> --file <путь до файла с данными> -- query <запрос к СУБД>. 
+2. The DBMS saves all data to the specified file. 
+3. The DBMS has a console interface that meets the following requirement. ./ <your program name> --file <the path to the data file> -- query <DBMS request>. 
 
-| Тип | Добавление | Удаление | Чтение | 
+| Data type | ADD | REMOVE | READ | 
 | ------ | ------ | ------ | ------ |
-| Стек | SPUSH | SPOP | SPOP |
-| Очередь | QPUSH | QPOP | QPOP |
-| Хеш-таблица | HSET | HDEL | HGET |
-| Множество | SADD | SREM | SISMEMBER |
-| Массив | ARADD, ARINS, ARCHG | ARDEL, ARREM | ARGET, ARSRCH | 
-| Односвязный список | LADD, LINS | LDEL_VAL, LDEL, LREM | LGET, LISMEMBER | 
-| Двусвязный список | DLADD, DLADDR, DLINS | DLDEL_VAL, DLREM, DLREMR, DLDEL | DLGET, DLISMEMBER |
-| Бинарное дерево | TADD | TDEL | TSRCH |
+| Stack | SPUSH | SPOP | SPOP |
+| Queue | QPUSH | QPOP | QPOP |
+| Hash-table | HSET | HDEL | HGET |
+| Set | SADD | SREM | SISMEMBER |
+| Array | ARADD, ARINS, ARCHG | ARDEL, ARREM | ARGET, ARSRCH | 
+| Linked list | LADD, LINS | LDEL_VAL, LDEL, LREM | LGET, LISMEMBER | 
+| Doubly linked list | DLADD, DLADDR, DLINS | DLDEL_VAL, DLREM, DLREMR, DLDEL | DLGET, DLISMEMBER |
+| Binary tree | TADD | TDEL | TSRCH |
 
 4. Требуется реализовать сетевой интерфейс для СУБД. При запуске приложения СУБД должна ожидать соединение по протоколу tcp на порту 6379. При подключении требуется обработать запрос либо в отдельном потоке, либо в отдельном процессе, либо асинхронной задачей и отдать результат в ответ на запрос. Также необходимо позаботится о блокировках на структуре БД если используются потоки или процессы.
 
