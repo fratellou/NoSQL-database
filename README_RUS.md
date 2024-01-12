@@ -48,11 +48,15 @@
 
 Пример работы программы:
 >./dbms --file file.data --query 'SPUSH struct val'
+>
 >REQUEST: val
+>
 >./dbms --file file.data --query 'SPUSH struct val10'
+>
 >REQUEST: val10
 
 Результат:
+
 stack: struct val10 val
 
 ![NoSQL-database](images/stack1.png)
@@ -61,6 +65,7 @@ stack: struct val10 val
 >REQUEST: val10
 
 Результат:
+
 stack: struct val
 
 ![NoSQL-database](images/stack2.png)
@@ -73,8 +78,11 @@ stack: struct val
 
 Пример работы программы:
 >./dbms --file file.data --query 'QPUSH struct val'
+>
 >REQUEST: val
+>
 >./dbms --file file.data --query 'QPUSH struct val10'
+>
 >REQUEST: val10
 
 Результат:
