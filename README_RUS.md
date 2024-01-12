@@ -65,7 +65,6 @@ stack: struct val10 val
 >REQUEST: val10
 
 Результат:
-
 \> stack: struct val
 
 ![NoSQL-database](images/stack2.png)
