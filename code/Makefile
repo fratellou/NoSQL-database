@@ -5,7 +5,7 @@ EXIT=$(STRUCT)objects/
 all:server client
 
 server: database.o hash.o stack.o array.o list.o tree.o queue.o hash.o double_list.o set.o
-	gcc $(CFLAGS) database.o $(EXIT)hash.o $(EXIT)array.o $(EXIT)tree.o $(EXIT)stack.o $(EXIT)list.o $(EXIT)queue.o $(EXIT)double_list.o $(EXIT)set.o -o server
+	gcc $(CFLAGS) $(EXIT)database.o $(EXIT)hash.o $(EXIT)array.o $(EXIT)tree.o $(EXIT)stack.o $(EXIT)list.o $(EXIT)queue.o $(EXIT)double_list.o $(EXIT)set.o -o server
 
 client: client.o
 	gcc $(CFLAGS) $(EXIT)client.o -o dbms
