@@ -25,28 +25,28 @@ To develop a NoSQL DBMS that meets the following requirements:
 | Doubly linked list | DLADD, DLADDR, DLINS | DLDEL_VAL, DLREM, DLREMR, DLDEL | DLGET, DLISMEMBER |
 | Binary tree | TADD | TDEL | TSRCH |
 
-4. Требуется реализовать сетевой интерфейс для СУБД. При запуске приложения СУБД должна ожидать соединение по протоколу tcp на порту 6379. При подключении требуется обработать запрос либо в отдельном потоке, либо в отдельном процессе, либо асинхронной задачей и отдать результат в ответ на запрос. Также необходимо позаботится о блокировках на структуре БД если используются потоки или процессы.
+4. It is required to implement a network interface for the DBMS. When launching the application, the DBMS should expect a tcp connection on port 6379. When connecting, it is required to process the request either in a separate thread, or in a separate process, or as an asynchronous task and return the result in response to the request. It is also necessary to take care of locks on the database structure if threads or processes are used.
 
-## Оглавление
+## Contents
 
-1. [Стек](#Стек)
-2. [Очередь](#Очередь)
-3. [Хеш-таблица](#Хеш-таблица)
-4. [Множество](#Множество)
-5. [Массив](#Массив)
-6. [Односвязный список](#Односвязный-список)
-7. [Двусвязный список](#Двусвязный-список)
-8. [Бинарное дерево](#Бинарное-дерево)
-9. [Сервер](#Сервер)
-10. [Клиент](#Клиент)
+1. [Stack](#stack)
+2. [Queue](#queue)
+3. [Hash table](#hash-table)
+4. [Set](#set)
+5. [Array](#array)
+6. [Linked list](#linked-list)
+7. [Doubly linked list](#doubly-linked-list)
+8. [Binary tree](#binary-tree)
+9. [Server](#server)
+10. [Client](#client)
 
-## Стек
+## Stack
 
-`SPUSH` - добавление элемента в вершину стека. Она принимает указатель на стек и указатель на элемент, который нужно добавить в стек. Сложность данной функции - O(1), так как все операции выполняются за постоянное время.
+`PUSH` - adding an element to the top of the stack. It takes a pointer to the stack and a pointer to the element to be added to the stack. The complexity of this function is O(1), since all operations are performed in constant time.
 
-`SPOP` - удаление элемента из вершины стека и его возврата. Она также принимает указатель на стек. Сложность данной функции также равна O(1), так как все операции выполняются за постоянное время.
+`SPOP` - removing an element from the top of the stack and returning it. It also accepts a pointer to the stack. The complexity of this function is also O(1), since all operations are performed in constant time.
 
-Пример работы программы:
+An example of how the program works:
 >./dbms --file file.data --query 'SPUSH struct val'
 >
 >REQUEST: val
@@ -67,13 +67,13 @@ To develop a NoSQL DBMS that meets the following requirements:
 
 ![NoSQL-database](images/stack2.png)
 
-## Очередь
+## Queue
 
-`QPUSH` – добавляет элемент в конец очереди. Она выделяет память для нового узла очереди, устанавливает значение элемента в этот узел и изменяет указатели на голову и хвост очереди соответственно. Также она увеличивает размер очереди на 1. Сложность данной функции также равна O(1), так как все операции выполняются за постоянное время.
+`QPUSH` – adds an item to the end of the queue. It allocates memory for a new queue node, sets the value of an element to that node, and changes the pointers to the head and tail of the queue, respectively. It also increases the queue size by 1. The complexity of this function is also O(1), since all operations are performed in constant time.
 
-`QPOP` - удаляет и возвращает элемент из начала очереди. Если очередь пуста, то она возвращает NULL. В противном случае, она сохраняет значение элемента из головы очереди, изменяет указатель на голову очереди на следующий элемент и уменьшает размер очереди на 1. Затем она возвращает сохраненное значение элемента. Сложность данной функции также равна O(1), так как все операции выполняются за постоянное время.
+`QPOP` - removes and returns an item from the beginning of the queue. If the queue is empty, it returns NULL. Otherwise, it saves the value of the element from the head of the queue, changes the pointer to the head of the queue to the next element and reduces the queue size by 1. Then it returns the stored value of the element. The complexity of this function is also O(1), since all operations are performed in constant time.
 
-Пример работы программы:
+An example of how the program works:
 >./dbms --file file.data --query 'QPUSH struct val'
 >
 >REQUEST: val
@@ -94,17 +94,17 @@ To develop a NoSQL DBMS that meets the following requirements:
 
 ![NoSQL-database](images/queue2.png)
 
-## Хеш-таблица
+## Hash table
 
-`hash_calc` – принимает на вход указатель на строку и возвращает хэш-код этой строки. Она вычисляет хэш-код суммированием ASCII-значений символов строки и возвращает остаток от деления на константу MAX_LEN. 
+`hash_calc` – accepts a pointer to a string as input and returns the hash code of this string. It calculates the hash code by summing the ASCII values of the string characters and returns the remainder of the division by the constant MAX_LEN. 
 
-`HSET` – добавляет пару ключ-значение в хэш-таблицу. Она вычисляет индекс в таблице с помощью функции hash_calc, затем проходит по связному списку элементов в этой ячейке таблицы, чтобы проверить, есть ли уже элемент с таким же ключом. Если элемент найден, то его значение обновляется. Если элемент не найден, то создается новый узел списка и добавляется в начало списка в данной ячейке таблицы. Сложность данной функции зависит от количества элементов списка в данной ячейке и составляет O(1) в среднем случае, если хэш-функция равномерно распределяет ключи.
+`HSET` – adds a key-value pair to the hash table. It calculates the index in the table using the hash_calc function, then goes through the linked list of elements in this table cell to check if there is already an element with the same key. If an element is found, its value is updated. If the item is not found, a new list node is created and added to the beginning of the list in this table cell. The complexity of this function depends on the number of list items in a given cell and is O(1) on average if the hash function distributes the keys evenly.
 
-`HDEL` – удаляет пару ключ-значение из хэш-таблицы. Она вычисляет индекс в таблице с помощью функции hash_calc, затем проходит по связному списку элементов в этой ячейке таблицы, чтобы найти узел с указанным ключом. Если узел найден, то его значение сохраняется, а узел удаляется из списка. Если узел не найден, то возвращается NULL. Сложность данной функции зависит от количества элементов списка в данной ячейке и составляет O(1) в среднем случае, если хэш-функция равномерно распределяет ключи.
+`HDEL` – removes the key-value pair from the hash table. It calculates the index in the table using the hash_calc function, then goes through the linked list of elements in this table cell to find the node with the specified key. If a node is found, its value is saved and the node is removed from the list. If the node is not found, NULL is returned. The complexity of this function depends on the number of list items in a given cell and is O(1) on average if the hash function distributes the keys evenly.
 
-`HGET` – возвращает значение, связанное с указанным ключом в хэш-таблице. Она вычисляет индекс в таблице с помощью функции hash_calc, затем проходит по связному списку элементов в этой ячейке таблицы, чтобы найти узел с указанным ключом. Если узел найден, то возвращается его значение. Если узел не найден, то возвращается NULL. Сложность данной функции зависит от количества элементов списка в данной ячейке и составляет O(1) в среднем случае, если хэш-функция равномерно распределяет ключи.
+`HGET` – returns the value associated with the specified key in the hash table. It calculates the index in the table using the hash_calc function, then goes through the linked list of elements in this table cell to find the node with the specified key. If the node is found, its value is returned. If the node is not found, NULL is returned. The complexity of this function depends on the number of list items in a given cell and is O(1) on average if the hash function distributes the keys evenly.
 
-Пример работы программы:
+An example of how the program works:
 >./dbms --file file.data --query 'HSET struct 1 val'
 >
 >REQUEST: val
@@ -129,18 +129,18 @@ To develop a NoSQL DBMS that meets the following requirements:
 >
 >REQUEST: val
 
-## Множество
+## Set
 
-`set_calc` – принимает ключ в виде строки и вычисляет хеш-код для данного ключа. Она проходит по каждому символу в строке ключа и суммирует их ASCII-коды. Результат суммирования берется по модулю от MAX_LEN (максимального количества элементов во множестве) и возвращается как хеш-код.
+`set_calc` – accepts the key as a string and calculates the hash code for this key. It goes through each character in the key string and summarizes their ASCII codes. The summation result is taken modulo MAX_LEN (the maximum number of elements in the set) and returned as a hash code.
 
-`SADD` – добавляет элемент в множество. Она вычисляет индекс элемента с помощью set_calc, затем проверяет, не является ли данный индекс занятым. Если индекс уже занят, то функция возвращает ошибку. В противном случае, она создает новую структуру Node_set, присваивает ей переданный элемент и добавляет ее в начало списка с индексом index в множестве set. В конце функция возвращает добавленный элемент.
+`SADD` – adds an element to the set. It calculates the index of the element using set_calc, then checks if this index is occupied. If the index is already occupied, the function returns an error. Otherwise, it creates a new Node_set structure, assigns the passed element to it and adds it to the top of the list with the index index in the set set. At the end, the function returns the added element.
 
-`SREM` – удаляет элемент из множества. Она вычисляет индекс элемента с помощью set_calc, затем проходит по списку элементов с данным индексом и ищет элемент для удаления. Если элемент найден, то он удаляется из списка, освобождается память и возвращается удаленный элемент. Если элемент не найден, то функция возвращает NULL.
+`SREM` – removes an element from the set. It calculates the index of the element using set_calc, then goes through the list of elements with this index and looks for the element to delete. If an item is found, it is deleted from the list, memory is freed, and the deleted item is returned. If the element is not found, the function returns NULL.
 
-`SISMEMBER` – проверяет, присутствует ли элемент в множестве. Она вычисляет индекс элемента с помощью set_calc, затем проходит по списку элементов с данным индексом и сравнивает каждый элемент с переданным элементом. Если элемент найден, то функция возвращает 1, в противном случае - 0.
-Для достижения сложности O(1) необходимо использовать хеш-таблицу для хранения элементов множества.
+`SISMEMBER` – checks whether an element is present in the set. It calculates the index of an element using set_calc, then goes through the list of elements with this index and compares each element with the passed element. If the element is found, the function returns 1, otherwise it returns 0.
+To achieve O(1) complexity, it is necessary to use a hash table to store the elements of the set.
 
-Пример работы программы:
+An example of how the program works:
 >./dbms --file file.data --query 'SADD struct val'
 >
 >REQUEST: val
@@ -161,24 +161,25 @@ To develop a NoSQL DBMS that meets the following requirements:
 >
 >REQUEST: FALSE
 
-## Массив
-`createArray` - создает массив и выделяет память для его элементов. Сложность данной функции составляет O(1), так как нам необходимо только однократно выделить память для массива.
+## Array
 
-`ARADD` - добавляет элемент в конец массива. Данная функция имеет сложность O(1), поскольку добавление элемента в конец массива не зависит от размера массива.
+`createArray` - creates an array and allocates memory for its elements. The complexity of this function is O(1), since we only need to allocate memory for the array once.
 
-`ARINS` - вставляет элемент в заданную позицию в массиве. Данная функция имеет сложность O(n), где n - размер массива, так как при вставке элемента в заданную позицию, все элементы после этой позиции будут сдвигаться на одну позицию вправо.
+`ARADD` - adds an element to the end of the array. This function has a complexity of O(1), since adding an element to the end of the array does not depend on the size of the array.
 
-`ARDEL` - Удаляет последний элемент массива. Данная функция имеет сложность O(1), так как удаление последнего элемента не зависит от размера массива.
+`ARINS` - inserts an element at a specified position in the array. This function has a complexity of O(n), where n is the size of the array, since when an element is inserted into a given position, all elements after this position will shift one position to the right.
 
-`ARREM` - Удаляет элемент в заданной позиции в массиве. Данная функция имеет сложность O(n), где n - размер массива, так как при удалении элемента из заданной позиции, все элементы после этой позиции будут сдвигаться на одну позицию влево.
+`ARDEL` - Deletes the last element of the array. This function has a complexity of O(1), since deleting the last element does not depend on the size of the array.
 
-`ARGET` - Возвращает значение элемента по заданному индексу. Данная функция имеет сложность O(1), так как доступ к элементу массива по индексу осуществляется непосредственно.
+`ARREM` - Deletes an element at a specified position in the array. This function has a complexity of O(n), where n is the size of the array, since when an element is removed from a given position, all elements after this position will shift one position to the left.
 
-`ARCHG` - Изменяет значение элемента по заданному индексу. Данная функция имеет сложность O(1), так как доступ к элементу массива по индексу осуществляется непосредственно.
+`ARGET` - Returns the value of the element at the specified index. This function has a complexity of O(1), since access to the array element by index is performed directly.
 
-`ARSRCH` - Поиск элемента в массиве и возвращает его индекс. Данная функция имеет сложность O(n), где n - размер массива, так как в худшем случае придется проверить все элементы массива.
+`ARCHG` - Changes the value of an element by the specified index. This function has a complexity of O(1), since access to the array element by index is performed directly.
 
-Пример работы программы:
+`ARSRCH` - Searches for an element in the array and returns its index. This function has a complexity of O(n), where n is the size of the array, since in the worst case you will have to check all the elements of the array.
+
+An example of how the program works:
 >./dbms --file file.data --query 'ARADD struct 1'
 >
 >REQUEST: 1
@@ -227,23 +228,23 @@ To develop a NoSQL DBMS that meets the following requirements:
 
 ![NoSQL-database](images/array4.png)
 
-## Односвязный список
+## Linked list
 
-`createList` - создает и инициализирует новую структуру списка. Она выделяет память под новый узел списка, присваивает ему переданные данные и устанавливает указатель на следующий элемент в NULL. Сложность этой функции O(1), так как операции над указателями занимают постоянное количество времени и не зависят от размера списка.
+`createList` - creates and initializes a new list structure. It allocates memory for a new list node, assigns the transferred data to it, and sets the pointer to the next element to NULL. The complexity of this function is O(1), since operations on pointers take a constant amount of time and do not depend on the size of the list.
 
-`LADD` - добавляет новый элемент в начало списка. Она создает новый узел с помощью функции createList и, если список пустой, присваивает голову списка указателю на новый узел. Если список не пустой, она устанавливает указатель на следующий элемент нового узла на текущую голову списка, а затем присваивает голову списка указателю на новый узел. Сложность этой функции также O(1), поскольку операции над указателями выполняются быстро независимо от размера списка.
+`LADD` - adds a new item to the top of the list. It creates a new node using the createList function and, if the list is empty, assigns the head of the list to a pointer to the new node. If the list is not empty, it sets the pointer to the next element of the new node to the current head of the list, and then assigns the head of the list to the pointer to the new node. The complexity of this function is also O(1), since operations on pointers are performed quickly regardless of the size of the list.
 
-`LINS` - добавляет элемент в список по заданному индексу. Она создает новый узел, а затем ищет позицию вставки перебирая элементы списка. Если индекс найден, она встанавливает указатель на следующий элемент нового узла на текущий элемент списка, а указатель на следующий элемент предыдущего узла на новый узел. Сложность этой функции O(n), где n - размер списка, так как она выполняет итерацию по всем элементам до заданного индекса.
+`LINS` - adds an item to the list at the specified index. It creates a new node, and then searches for the insertion position by going through the list items. If the index is found, it places the pointer to the next element of the new node on the current list item, and the pointer to the next element of the previous node on the new node. The complexity of this function is O(n), where n is the size of the list, since it iterates through all the elements to a given index.
 
-`LDEL_VAL` -  удаляет элемент из списка по заданному значению. Она ищет элемент соответствующий заданному значению и удаляет его из списка. Сложность этой функции также O(n), так как она выполняет итерацию по всем элементам списка до нахождения элемента с заданным значением.
+`LDEL_VAL` - removes an item from the list by the specified value. It searches for the element corresponding to the specified value and removes it from the list. The complexity of this function is also O(n), since it iterates through all the elements of the list until an element with a given value is found.
 
-`LDEL` -  удаляет элемент из начала списка. Она сохраняет значение головы списка, затем обновляет голову списка на следующий элемент списка. Сложность этой функции O(1), так как единственная операция выполняемая над указателями - обновление головы списка - занимает постоянное количество времени и не зависит от размера списка.
+`LDEL` - removes an item from the top of the list. It saves the value of the list head, then updates the list head to the next list item. The complexity of this function is O(1), since the only operation performed on pointers - updating the head of the list - takes a constant amount of time and does not depend on the size of the list.
 
-`LREM` - удаляет элемент из списка по заданному индексу. Она ищет элемент с заданным индексом и удаляет его из списка. Сложность этой функции также O(n), так как она выполняет итерацию по всем элементам списка до нахождения элемента с заданным индексом.
+`LREM` - removes an item from the list at the specified index. It searches for an item with the specified index and removes it from the list. The complexity of this function is also O(n), since it iterates through all the elements of the list until the element with the specified index is found.
 
-`LGET` -  ищет элемент в списке. Она выполняет итерацию по всем элементам списка, пока не найдет элемент с заданным значением или не достигнет конца списка. Сложность этой функции также O(n), так как она выполняет итерацию по всем элементам списка в худшем случае.
+`LGET` - searches for an item in the list. It iterates through all the items in the list until it finds an item with the specified value or reaches the end of the list. The complexity of this function is also O(n), since it iterates over all elements of the list in the worst case.
 
-Пример работы программы:
+An example of how the program works:
 >./dbms --file file.data --query 'LADD struct 3'
 >
 >REQUEST: 3
@@ -279,35 +280,35 @@ To develop a NoSQL DBMS that meets the following requirements:
 >REQUEST: TRUE
 
 
-## Двусвязный список
+## Doubly linked list
 
-`createDList` -  создает и инициализирует новую структуру данных двусвязного списка. Она выделяет память под структуру DList, устанавливает указатели head и tail на NULL и возвращает созданный список. Сложность этой функции O(1), так как выделение памяти и установка указателей выполняются за постоянное время.
+`createDList` - creates and initializes a new data structure for a doubly linked list. It allocates memory for the DList structure, sets the head and tail pointers to NULL, and returns the created list. The complexity of this function is O(1), since memory allocation and pointer installation are performed in constant time.
 
-`createNode` -  создает и инициализирует новый узел списка. Она выделяет память под структуру Node_Dlist, устанавливает указатель на предыдущий и следующий узлы на NULL, устанавливает переданные данные в поле element и возвращает созданный узел. Сложность этой функции также O(1), так как выделение памяти и установка указателей выполняются за постоянное время.
+`createNode` - creates and initializes a new list node. It allocates memory for the Node_Dlist structure, sets the pointer to the previous and next nodes to NULL, sets the transmitted data in the element field and returns the created node. The complexity of this function is also O(1), since memory allocation and pointer installation are performed in constant time.
 
-`DLADD` -  добавляет элемент в начало списка. Она создает новый узел с переданными данными и, если список пустой, устанавливает head и tail на новый узел. Иначе, она устанавливает указатель next нового узла на текущий head, указатель prev текущего head на новый узел и обновляет head на новый узел. Сложность этой функции тоже O(1), так как все операции выполняются за постоянное время.
+`DLADD` - adds an item to the top of the list. It creates a new node with the transferred data and, if the list is empty, sets head and tail to the new node. Otherwise, it sets the next pointer of the new node to the current head, the prev pointer of the current head to the new node, and updates the head to the new node. The complexity of this function is also O(1), since all operations are performed in constant time.
 
-`DLADDR` -  добавляет элемент в конец списка. Она создает новый узел с переданными данными и, если список пустой, устанавливает head и tail на новый узел. Иначе, она устанавливает указатель next текущего tail на новый узел, указатель prev нового узла на текущий tail и обновляет tail на новый узел. Сложность этой функции также O(1), так как все операции выполняются за постоянное время.
+`DLADDR` - adds an item to the end of the list. It creates a new node with the transferred data and, if the list is empty, sets head and tail to the new node. Otherwise, it sets the next pointer of the current tail to the new node, the prev pointer of the new node to the current tail, and updates the tail to the new node. The complexity of this function is also O(1), since all operations are performed in constant time.
 
-`DLDEL_VAL`- удаляет значение из списка и возвращает обновленный список. Она использует функцию DLGET() для нахождения индекса значения в списке и функцию DLREM() для удаления элемента из списка по индексу. Затем она обновляет указатель head на результат удаления элемента и возвращает обновленный список. Сложность этой функции также O(1), так как все операции выполняются за постоянное время.
+`DLDEL_VAL`- removes a value from the list and returns an updated list. It uses the DLGET() function to find the index of a value in the list and the DLREM() function to remove an item from the list by index. Then it updates the head pointer to the result of deleting the element and returns an updated list. The complexity of this function is also O(1), since all operations are performed in constant time.
 
-`DLINS` - добавляет элемент по заданному индексу в списке. Она создает новый узел с переданными данными и, если список пустой и индекс равен нулю, устанавливает head и tail на новый узел. Иначе, она выполняет следующий алгоритм:
-1. Находит узел с указанным индексом в списке.
-2. Если узел с указанным индексом не найден, устанавливает переданное значение element в "n/a".
-3. Иначе, устанавливает указатель next нового узла на текущий узел с найденным индексом, указатель prev нового узла на предыдущий узел найденного узла (если есть) или на NULL (если нет), обновляет указатель prev следующего узла после найденного индекса на новый узел и обновляет указатель next предыдущего узла перед найденным индексом на новый узел. Если предыдущий узел отсутствует, обновляет head на новый узел, иначе обновляет tail на новый узел.
-4. Устанавливает переданные данные в переменную element.
-5. Возвращает обновленный список.
-Сложность этой функции также O(1), так как все операции выполняются за постоянное время, за исключением while-цикла, который перебирает узлы до указанного индекса, но предполагается, что количество узлов ограничено и не зависит от размера списка.
+`DLINS` - adds an element to the specified index in the list. It creates a new node with the transferred data and, if the list is empty and the index is zero, sets head and tail to the new node. Otherwise, it executes the following algorithm:
+1. Finds the node with the specified index in the list.
+2. If the node with the specified index is not found, sets the passed element value to "n/a".
+3. Otherwise, sets the next pointer of the new node to the current node with the found index, the prev pointer of the new node to the previous node of the found node (if any) or to NULL (if not), updates the prev pointer of the next node after the found index to the new node and updates the next pointer of the previous node before the found index to the new node. If the previous node is missing, updates the head to the new node, otherwise updates the tail to the new node.
+4. Sets the passed data to the element variable.
+5. Returns the updated list.
+The complexity of this function is also O(1), since all operations are performed in constant time, with the exception of the while loop, which iterates through nodes to the specified index, but it is assumed that the number of nodes is limited and does not depend on the size of the list.
 
-`DLREMR` - удаляет узел с конца двусвязного списка. Если список пуст, она возвращает NULL и копирует строку "n/a" в переменную element. Иначе, она копирует значение элемента последнего узла в element, освобождает память, связанную с последним узлом и изменяет указатели, чтобы обновить список. Сложность функции DLREMR составляет O(1), так как операции копирования и изменения указателей выполняются за константное время.
+`DLREMR` - removes a node from the end of a doubly linked list. If the list is empty, it returns NULL and copies the string "n/a" to the element variable. Otherwise, it copies the value of the element of the last node to the element, frees up the memory associated with the last node and changes the pointers to update the list. The complexity of the DLREMR function is O(1), since the operations of copying and changing pointers are performed in constant time.
 
-`DLDEL` - удаляет узел из начала двусвязного списка. Если список пуст, она возвращает NULL и копирует строку "n/a" в переменную element. Иначе, она копирует значение элемента первого узла в element, освобождает память, связанную с первым узлом и изменяет указатели, чтобы обновить список. Сложность функции DLDEL составляет O(1), так как операции копирования и изменения указателей выполняются за константное время.
+`DLDEL` - removes a node from the beginning of a doubly linked list. If the list is empty, it returns NULL and copies the string "n/a" to the element variable. Otherwise, it copies the value of the element of the first node to the element, frees up the memory associated with the first node and changes the pointers to update the list. The complexity of the DLDEL function is O(1), since the operations of copying and changing pointers are performed in constant time.
 
-`DLREM` - удаляет узел из двусвязного списка по заданному индексу. Если список пуст, она копирует строку "n/a" в переменную element. Иначе, она находит узел с заданным индексом и копирует значение его элемента в element, изменяет указатели, чтобы обновить список и освобождает память, связанную с удаленным узлом. Сложность функции DLREM- составляет O(n), где n - количество узлов в списке. В худшем случае функция должна пройти через все узлы до достижения узла с заданным индексом.
+`DLREM` - removes a node from a doubly linked list at the specified index. If the list is empty, it copies the string "n/a" to the element variable. Otherwise, it finds the node with the specified index and copies the value of its element to element, changes the pointers to update the list and frees up the memory associated with the deleted node. The complexity of the DLREM function is O(n), where n is the number of nodes in the list. In the worst case, the function must pass through all nodes before reaching the node with the specified index.
 
-`DLGET` - выполняет поиск узла с заданным значением элемента в двусвязном списке. Если элемент найден, функция возвращает индекс этого узла. В противном случае, она возвращает -1. Сложность функции DLGET составляет O(n), где n - количество узлов в списке. В худшем случае функция должна пройти через все узлы для поиска заданного элемента.
+`DLGET' - searches for a node with a given element value in a doubly linked list. If an element is found, the function returns the index of that node. Otherwise, it returns -1. The complexity of the DLGET function is O(n), where n is the number of nodes in the list. In the worst case, the function must go through all the nodes to find a given element.
 
-Пример работы программы:
+An example of how the program works:
 >./dbms --file file.data --query 'DLADD struct 1'
 >
 >REQUEST: 1
@@ -344,23 +345,23 @@ To develop a NoSQL DBMS that meets the following requirements:
 >
 >REQUEST: -1
 
-## Бинарное дерево
+## Binary tree
 
-`createTree` - создает новый узел дерева с заданным ключом. Она выделяет память для нового узла, устанавливает значение ключа, родительский узел, левый и правый дочерние узлы, и возвращает новый узел. Сложность этой функции относительно O(1), так как независимо от размера дерева, она выполняет фиксированное количество операций.
+`createTree` - creates a new tree node with the specified key. It allocates memory for the new node, sets the key value, the parent node, the left and right child nodes, and returns the new node. The complexity of this function is relatively O(1), since regardless of the size of the tree, it performs a fixed number of operations.
 
-`TADD` - вставляет новый узел с заданным ключом в дерево. Если дерево пустое, она вызывает функцию createTree для создания корневого узла и возвращает его. В противном случае, она проходит по дереву, чтобы найти подходящую позицию для вставки нового узла. Затем она создает новый узел, устанавливает его ключ, родительский узел, левый и правый дочерние узлы, и возвращает корень дерева. Сложность этой функции относительно O(log n), где n - количество узлов в дереве. В худшем случае, когда дерево является сбалансированным, требуется пройти по высоте дерева для вставки нового узла.
+`TADD` - inserts a new node with the specified key into the tree. If the tree is empty, it calls the createTree function to create a root node and returns it. Otherwise, it goes through the tree to find a suitable position to insert a new node. Then it creates a new node, sets its key, parent node, left and right child nodes, and returns the root of the tree. The complexity of this function is relative to O(log n), where n is the number of nodes in the tree. In the worst case, when the tree is balanced, you need to go through the height of the tree to insert a new node.
 
-`TSRCH` - ищет узел с заданным ключом в дереве. Если дерево пустое или ключ текущего узла равен заданному ключу, она возвращает текущий узел. В противном случае, она рекурсивно вызывает себя для левого или правого дочернего узла в зависимости от значения ключа. Возвращает найденный узел или NULL, если узел не найден. Сложность этой функции относительно O(log n), где n - количество узлов в дереве. В худшем случае, когда дерево является сбалансированным, требуется пройти по высоте дерева для поиска узла.
+`TSRCH` - searches for a node with the specified key in the tree. If the tree is empty or the key of the current node is equal to the specified key, it returns the current node. Otherwise, it recursively calls itself for the left or right child node depending on the value of the key. Returns the found node or NULL if the node is not found. The complexity of this function is relative to O(log n), where n is the number of nodes in the tree. In the worst case, when the tree is balanced, you need to go through the height of the tree to find a node.
 
-`succ` - возвращает преемника заданного узла в дереве. Если у правого дочернего узла есть поддерево, она вызывает функцию min для нахождения минимального значения в этом поддереве и возвращает его. В противном случае, она проходит вверх по дереву, чтобы найти преемника. Возвращает найденного преемника или NULL, если преемник не найден. Сложность этой функции относительно O(log n), где n - количество узлов в дереве. В худшем случае, когда дерево является сбалансированным, требуется пройти по высоте дерева для поиска преемника.
+`succ` - returns the successor of the specified node in the tree. If the right child node has a subtree, it calls the min function to find the minimum value in this subtree and returns it. Otherwise, she goes up the tree to find a successor. Returns the found successor, or NULL if no successor is found. The complexity of this function is relative to O(log n), where n is the number of nodes in the tree. In the worst case, when the tree is balanced, it is required to go through the height of the tree to find a successor.
 
-`min` - возвращает узел с минимальным значением в дереве. Она проходит вниз по левому поддереву, чтобы найти минимальное значение. Возвращает найденный узел.
+`min` - returns the node with the minimum value in the tree. It goes down the left subtree to find the minimum value. Returns the found node.
 
-`TDEL` - удаляет узел с заданным ключом из двоичного дерева поиска. Она вызывает функцию TSRCH для поиска узла с заданным ключом. Если узел найден, она проверяет его наличие дочерних узлов для определения типа удаления: если узел является листом, он просто удаляется, если узел имеет только левого или только правого дочернего узла, он замещается на своего ребенка, если узел имеет оба дочерних узла, его заменяет преемник. Возвращает корень дерева.
+`TDEL` - removes the node with the specified key from the binary search tree. It calls the TSRCH function to search for a node with a given key. If a node is found, it checks its presence of child nodes to determine the type of deletion: if the node is a leaf, it is simply deleted, if the node has only a left or only a right child node, it is replaced by its child, if the node has both child nodes, it is replaced by a successor. Returns the root of the tree.
 
-`printTree` - функция используется для печати содержимого бинарного дерева в структурированном виде. Она принимает указатель на корень дерева и переменную "space", которая используется для отступа при печати дерева. Сложность этой функции относительно O - это O(n), где n - количество узлов в бинарном дереве. Так как функция должна обойти все узлы дерева, ее сложность линейно зависит от размера дерева.
+The `printTree` function is used to print the contents of a binary tree in a structured form. It takes a pointer to the root of the tree and the variable "space", which is used to indent when printing the tree. The complexity of this function with respect to O is O(n), where n is the number of nodes in the binary tree. Since the function must traverse all nodes of the tree, its complexity depends linearly on the size of the tree.
 
-Пример работы программы:
+An example of how the program works:
 >./dbms --file file.data --query 'TADD struct 1'
 >
 >REQUEST: 1
@@ -387,42 +388,42 @@ To develop a NoSQL DBMS that meets the following requirements:
 
 ![NoSQL-database](images/binary_tree2.png)
 
-## Сервер
+## Server
 
-`main` выполняет следующие действия:
--	Создание структуры sockaddr_in для адреса сервера и клиента.
--	Создание сокета с помощью функции socket(). Если создание сокета не удалось, то выводится сообщение об ошибке и программа завершает работу.
--	Установка параметров адреса сервера, включая семейство протоколов (AF_INET), IP-адрес (INADDR_ANY) и порт (PORT).
--	Привязка сокета к адресу сервера с помощью функции bind(). Если привязка не удалась, то выводится сообщение об ошибке и программа завершает работу.
--	Ожидание соединений с помощью функции listen(). Если ожидание не удалось, то выводится сообщение об ошибке и программа завершает работу.
--	Вывод сообщения о запуске сервера и ожидании соединений.
+`main` performs the following actions:
+- Creating a sockaddr_in structure for the server and client addresses.
+- Create a socket using the socket() function. If the socket creation failed, an error message is displayed and the program shuts down.
+- Setting the server address parameters, including the protocol family (AF_INET), IP address (INADDR_ANY) and port (PORT).
+- Binding a socket to the server address using the bind() function. If the binding fails, an error message is displayed and the program shuts down.
+- Waiting for connections using the listen() function. If the wait fails, an error message is displayed and the program shuts down.
+- Displays a message about starting the server and waiting for connections.
 
-В цикле:
--	Получение нового сокета клиента с помощью функции accept(). Если получение сокета не удалось, то выводится сообщение об ошибке и программа завершает работу.
--	Вывод сообщения о принятии нового соединения.
--	Обработка запроса клиента в отдельном потоке с помощью функции handle_client(). 
+In the loop:
+- Getting a new client socket using the accept() function. If the socket was not received, an error message is displayed and the program shuts down.
+- Displays a message about accepting a new connection.
+- Processing the client's request in a separate thread using the handle_client() function. 
 
-`handle_client` - принимает аргумент client_socket, который является файловым дескриптором сокета, используемого для связи с клиентом. Внутри функции создается и инициализируется мьютекс mutex. Далее, выделяется память для строки db_file и query, после чего считываются данные из client_socket и записываются в соответствующие строки. Затем создается указатель на строку req, выделяется память для массива строк parsed_query и выполняется разбиение query на отдельные слова (разделенные пробелами), каждое из которых сохраняется в свою строку в массиве parsed_query. 
+`handle_client` - accepts the client_socket argument, which is the file descriptor of the socket used to communicate with the client. A mutex mutex is created and initialized inside the function. Next, memory is allocated for the db_file and query lines, after which data is read from the client_socket and written to the corresponding lines. Then a pointer to the req string is created, memory is allocated for the array of parsed_query strings and the query is split into separate words (separated by spaces), each of which is saved to its own string in the parsed_query array. 
 
-`request` - принимает три аргумента: указатель на строку db_file, двойной указатель на строку query и указатель на строку req. Эта функция служит для обработки запроса клиента. Результат выполнения функции записывается в req.
+'request` - accepts three arguments: a pointer to the db_file string, a double pointer to the query string, and a pointer to the req string. This function is used to process the client's request. The result of the function execution is recorded in req.
 
-`send` - результат отправляется клиенту, после чего освобождается выделенная память для строк db_file, query и req. Мьютекс уничтожается, сокет клиента закрывается и выводится сообщение о завершении подключения.
+`send` - the result is sent to the client, after which the allocated memory for the db_file, query and req lines is freed. The mutex is destroyed, the client socket is closed and a message is displayed about the completion of the connection.
 
-## Клиент
+## Client
 
-`main` выполняет следующие действия:
+`main` performs the following actions:
 
-- Проверяет, переданы ли аргументы командной строки (входные параметры) при запуске программы.
-- Создаёт две переменные с указателями на символьный массив (строку) db_file и query.
-- В цикле проходит по каждому аргументу командной строки (начиная с индекса 1) и проверяет, соответствует ли текущий аргумент одному из двух флагов "--file" или "--query". Если да, то считывает следующий аргумент в переменную db_file или query соответственно. После этого увеличивает значение счетчика counter_of_flags.
+- Checks whether command line arguments (input parameters) are passed when the program is started.
+- Creates two variables with pointers to a character array (string) db_file and query.
+- In the loop, it goes through each command line argument (starting from index 1) and checks whether the current argument corresponds to one of the two flags "--file" or "--query". If so, reads the next argument into the db_file or query variable, respectively. After that, it increases the value of the counter_of_flags counter.
 
-Если количество считанных флагов равно TASK_FLAGS (некоторая константа) и количество аргументов командной строки превышает TASK_FLAGS, то программа выполняет следующие действия:
-  - Создание сокета с помощью функции socket(). Функция принимает первым параметром домен (семейство протоколов), в данном случае AF_INET - используется протокол IPv4, вторым параметром тип сокета (SOCK_STREAM - ориентированный на соединения потоковый сокет, обеспечивающий надежную передачу данных), а третьим параметром - протокол (0 - протокол выбирается автоматически).
-  - Задание адреса сервера с помощью структуры sockaddr_in. Устанавливается семейство протоколов AF_INET, в котором используется IP-адрес 127.0.0.1 (localhost) и порт PORT (также является константой).
-  - Установка соединения с сервером с помощью функции connect(). В качестве параметров передаются созданный сокет, указатель на структуру серверного адреса и его размер.
-  - Отправка запроса серверу с помощью функции send(). В первом параметре указывается сокет, во втором - данные (строка db_file), в третьем - размер данных, а в четвертом - флаги. Затем отправляется второй запрос с помощью функции send() и передачей строки query.
-  - Вывод сообщения о успешной отправке запроса.
-  - Создание буфера response, в который будет записан ответ сервера.
-  - Получение ответа сервера с помощью функции recv(). В качестве параметров передаются сокет, буфер response, размер буфера и флаги.
-  - Вывод полученного ответа.
-  - Закрытие сокета с помощью функции close().
+If the number of flags read is equal to TASK_FLAGS (some constant) and the number of command line arguments exceeds TASK_FLAGS, the program performs the following actions:
+- Creating a socket using the socket() function. The function takes the domain (protocol family) as the first parameter, in this case AF_INET - the IPv4 protocol is used, the second parameter is the socket type (SOCK_STREAM - a connection-oriented streaming socket that provides reliable data transmission), and the third parameter is the protocol (0 - the protocol is selected automatically).
+  - Setting the server address using the sockaddr_in structure. The AF_INET protocol family is installed, which uses the IP address 127.0.0.1 (localhost) and the PORT (also a constant).
+  - Establish a connection to the server using the connect() function. The created socket, a pointer to the structure of the server address and its size are passed as parameters.
+  - Sending a request to the server using the send() function. The first parameter specifies the socket, the second parameter specifies the data (db_file string), the third parameter specifies the size of the data, and the fourth parameter specifies the flags. Then a second request is sent using the send() function and passing the query string.
+  - Displays a message about the successful sending of the request.
+  - Creating a response buffer in which the server's response will be recorded.
+  - Receiving the server response using the recv() function. The socket, response buffer, buffer size, and flags are passed as parameters.
+  - Output of the received response.
+  - Closing the socket using the close() function.
