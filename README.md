@@ -427,3 +427,6 @@ If the number of flags read is equal to TASK_FLAGS (some constant) and the numbe
   - Receiving the server response using the recv() function. The socket, response buffer, buffer size, and flags are passed as parameters.
   - Output of the received response.
   - Closing the socket using the close() function.
+
+>
+>fratellou, 2023
