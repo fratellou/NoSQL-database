@@ -419,14 +419,14 @@ In the loop:
 
 If the number of flags read is equal to TASK_FLAGS (some constant) and the number of command line arguments exceeds TASK_FLAGS, the program performs the following actions:
 - Creating a socket using the socket() function. The function takes the domain (protocol family) as the first parameter, in this case AF_INET - the IPv4 protocol is used, the second parameter is the socket type (SOCK_STREAM - a connection-oriented streaming socket that provides reliable data transmission), and the third parameter is the protocol (0 - the protocol is selected automatically).
-  - Setting the server address using the sockaddr_in structure. The AF_INET protocol family is installed, which uses the IP address 127.0.0.1 (localhost) and the PORT (also a constant).
-  - Establish a connection to the server using the connect() function. The created socket, a pointer to the structure of the server address and its size are passed as parameters.
-  - Sending a request to the server using the send() function. The first parameter specifies the socket, the second parameter specifies the data (db_file string), the third parameter specifies the size of the data, and the fourth parameter specifies the flags. Then a second request is sent using the send() function and passing the query string.
-  - Displays a message about the successful sending of the request.
-  - Creating a response buffer in which the server's response will be recorded.
-  - Receiving the server response using the recv() function. The socket, response buffer, buffer size, and flags are passed as parameters.
-  - Output of the received response.
-  - Closing the socket using the close() function.
+- Setting the server address using the sockaddr_in structure. The AF_INET protocol family is installed, which uses the IP address 127.0.0.1 (localhost) and the PORT (also a constant).
+- Establish a connection to the server using the connect() function. The created socket, a pointer to the structure of the server address and its size are passed as parameters.
+- Sending a request to the server using the send() function. The first parameter specifies the socket, the second parameter specifies the data (db_file string), the third parameter specifies the size of the data, and the fourth parameter specifies the flags. Then a second request is sent using the send() function and passing the query string.
+- Displays a message about the successful sending of the request.
+- Creating a response buffer in which the server's response will be recorded.
+- Receiving the server response using the recv() function. The socket, response buffer, buffer size, and flags are passed as parameters.
+- Output of the received response.
+- Closing the socket using the close() function.
 
 >
 >fratellou, 2023
